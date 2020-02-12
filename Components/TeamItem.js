@@ -4,8 +4,8 @@ import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native'
 class TeamItem extends React.Component {
     render() {
      
-        const { team, displayDetailForTeam } = this.props
-        
+        const { team, displayDetailForTeam } = this.props        
+
         return (
             <TouchableOpacity onPress={() => displayDetailForTeam(team.idTeam)} style={styles.main_container}>
                 <Image style={styles.image} source={{uri: team.strTeamBadge}}/>
