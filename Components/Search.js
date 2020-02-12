@@ -40,6 +40,10 @@ class Search extends React.Component {
         this.searchedText = text
     }
 
+    _displayDetailForTeam = (idTeam) => {
+        this.props.navigation.navigate("TeamDetail", {idTeam: idTeam })
+    }
+
     render() {
         
         return (
@@ -49,7 +53,7 @@ class Search extends React.Component {
                 <FlatList
                     data={this.state.teams}
                     keyExtractor={(item) => item.idTeam.toString()}
-                    renderItem={({ item }) => <TeamItem team={item} />}
+                    renderItem={({ item }) => <TeamItem team={item} displayDetailForTeam={this._displayDetailForTeam}/>}
                 />
                 {this._displayLoading()}
             </View>
@@ -59,7 +63,6 @@ class Search extends React.Component {
 
 const styles = StyleSheet.create({
     main_container: {
-        marginTop: 30,
         flex: 1
     },
     textinput: {

@@ -1,13 +1,13 @@
 import React from 'react'
-import { StyleSheet, View, Text, Image } from 'react-native'
+import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native'
 
 class TeamItem extends React.Component {
     render() {
      
-        const team = this.props.team        
+        const { team, displayDetailForTeam } = this.props
         
         return (
-            <View style={styles.main_container}>
+            <TouchableOpacity onPress={() => displayDetailForTeam(team.idTeam)} style={styles.main_container}>
                 <Image style={styles.image} source={{uri: team.strTeamBadge}}/>
                 <View style={styles.content_container}>
                     <View style={styles.header_container}>
@@ -20,7 +20,7 @@ class TeamItem extends React.Component {
                         <Text style={styles.date_text}>Club fondé en {team.intFormedYear}</Text>
                     </View>
                 </View>
-            </View>
+            </TouchableOpacity>
         )
     }
 }
