@@ -1,6 +1,7 @@
 import React from 'react'
-import { StyleSheet, View, Text, ActivityIndicator, ScrollView, Image } from 'react-native'
+import { StyleSheet, View, Text, ActivityIndicator, ScrollView, Image, TouchableOpacity } from 'react-native'
 import { getTeamsDetailFromApi } from '../API/FCApi'
+import { connect } from 'react-redux'
 
 class TeamDetail extends React.Component {
 
@@ -13,12 +14,41 @@ class TeamDetail extends React.Component {
     }
 
     componentDidMount() {
+        const favoriteTeamIndex = this.props.favoritesTeam.findIndex(item => item.idTeam === this.props.navigation.state.params.idTeam)
+        if (favoriteTeamIndex !== -1) {
+            this.setState({
+                team: this.props.favoritesTeam[favoriteTeamIndex]
+            })
+            return
+        }
+        this.setState({ isLoading: true })
         getTeamsDetailFromApi(this.props.navigation.state.params.idTeam).then(data => {
             this.setState({
                 teams: data.teams[0],
                 isLoading: false
             })
         })
+    }
+
+    _toggleFavorite() {
+        const action = { type: "TOGGLE_FAVORITE", value: this.state.teams }
+        this.props.dispatch(action)
+    }
+
+    componentDidUpdate() {
+        
+    }
+
+    _displayFavoriteImage() {
+        var sourceImage = require('../assets/heart_empty.png')
+        if (this.props.favoritesTeam.findIndex(item => item.idTeam === this.state.teams.idTeam) !== -1) {
+            sourceImage = require('../assets/heart_full.png')
+        }
+        return (
+            <Image
+            source={sourceImage}
+            style={styles.favorite_image} />
+        )
     }
 
     _displayTeam() {
@@ -31,12 +61,15 @@ class TeamDetail extends React.Component {
                     <Image style={styles.image} source={team.strTeamBanner ? { uri: team.strTeamBanner } : require('../assets/banner-img.jpg')} />
                     <Text style={styles.name}>{team.strTeam}</Text>
                     <Text style={styles.alternate}>Sport: {team.strSport}</Text>
+                    <TouchableOpacity style={styles.favorite_container} onPress={() => this._toggleFavorite()}>
+                        {this._displayFavoriteImage()}
+                    </TouchableOpacity>
                     <View style={styles.infoleague}>
                         <Text style={styles.country}>{team.strCountry}</Text>
                         <Text style={styles.league}>League: {team.strLeague}</Text>
                     </View>
                     <Text style={styles.description}>{team.strDescriptionEN}</Text>
-                    <Image style={styles.stadiumimg} source={{ uri: team.strStadiumThumb }} />
+                    <Image style={styles.stadiumimg} source={team.strStadiumThumb ? { uri: team.strStadiumThumb } : require('../assets/stadium.jpg')} />
                     <View style={styles.infostadium}>
                         <Text style={styles.stadium}>{team.strStadium}</Text>
                         <Text style={styles.town}>{team.strStadiumLocation}</Text>
@@ -59,8 +92,7 @@ class TeamDetail extends React.Component {
         }
     }
 
-    render() {
-        const idTeam = this.props.navigation.state.params.idTeam
+    render() {     
         return (
             <View style={styles.main_container}>
                 {this._displayTeam()}
@@ -88,7 +120,9 @@ const styles = StyleSheet.create({
     },
     image: {
         height: 100,
-        resizeMode: 'cover'
+        resizeMode: 'cover',
+        alignSelf: "center",
+        aspectRatio: 4
     },
     name: {
         fontWeight: "bold",
@@ -132,7 +166,10 @@ const styles = StyleSheet.create({
         fontWeight: "bold"
     },
     stadiumimg: {
-        height: 100
+        height: 150,
+        resizeMode: "cover",
+        alignSelf: "center",
+        aspectRatio: 3
     },
     capacity: {
         textAlign: "center",
@@ -147,7 +184,20 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         marginTop: 10,
         marginBottom: 10
+    },
+    favorite_container: {
+        alignItems: 'center'
+    },
+    favorite_image: {
+        width: 40,
+        height: 40
     }
 })
 
-export default TeamDetail
+const mapStateToProps = (state) => {
+    return {
+        favoritesTeam: state.favoritesTeam
+    }
+}
+
+export default connect(mapStateToProps)(TeamDetail)

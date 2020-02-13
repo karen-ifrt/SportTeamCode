@@ -1,6 +1,7 @@
 import React from 'react'
 import { StyleSheet, View, Button, TextInput, FlatList, Text, ActivityIndicator } from 'react-native'
 import TeamItem from './TeamItem'
+import TeamList from './TeamList'
 import { getTeamsFromApiWithSearchedText } from '../API/FCApi'
 
 class Search extends React.Component {
@@ -48,12 +49,13 @@ class Search extends React.Component {
         
         return (
             <View style={styles.main_container}>
-                <TextInput onSubmitEditing={() => this._loadTeams()} onChangeText={(text) => this._searchTextInputChanged(text)} style={styles.textinput} placeholder="Équipe" />
-                <Button style={{ height: 50 }} title="Rechercher" onPress={() => this._loadTeams()} />
-                <FlatList
-                    data={this.state.teams}
-                    keyExtractor={(item) => item.idTeam.toString()}
-                    renderItem={({ item }) => <TeamItem team={item} displayDetailForTeam={this._displayDetailForTeam}/>}
+                <TextInput onSubmitEditing={() => this._loadTeams()} onChangeText={(text) => this._searchTextInputChanged(text)} style={styles.textinput} placeholder="Team" />
+                <Button style={{ height: 50 }} title="Search" onPress={() => this._loadTeams()} />
+                <TeamList
+                teams={this.state.teams}
+                navigation={this.props.navigation}
+                loadTeams={this._loadTeams}
+                favoriteList={false}
                 />
                 {this._displayLoading()}
             </View>
@@ -83,5 +85,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     }
 })
+
 
 export default Search
