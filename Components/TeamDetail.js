@@ -1,9 +1,25 @@
 import React from 'react'
-import { StyleSheet, View, Text, ActivityIndicator, ScrollView, Image, TouchableOpacity } from 'react-native'
+import { StyleSheet, Share, View, Platform, Text, ActivityIndicator, ScrollView, Image, TouchableOpacity } from 'react-native'
 import { getTeamsDetailFromApi } from '../API/FCApi'
 import { connect } from 'react-redux'
 
 class TeamDetail extends React.Component {
+
+    static navigationOptions = ({ navigation }) => {
+        const { params } = navigation.state
+        if (params.team != undefined && Platform.OS === 'ios') {
+            return {
+                headerRight: <TouchableOpacity
+                                style={styles.share_touchable_headerrightbutton}
+                                onPress={() => params.shareTeam()}>
+                                <Image
+                                    style={styles.share_image}
+                                    source={require('../assets/share_ios.png')}
+                                />    
+                                </TouchableOpacity>
+            }
+        }
+    }
 
     constructor(props) {
         super(props)
@@ -13,12 +29,19 @@ class TeamDetail extends React.Component {
         }
     }
 
+    _updateNavigationParams() {
+        this.props.navigation.setParams({
+            shareTeam: this._shareTeam,
+            team: this.state.teams
+        })
+    }
+
     componentDidMount() {
         const favoriteTeamIndex = this.props.favoritesTeam.findIndex(item => item.idTeam === this.props.navigation.state.params.idTeam)
         if (favoriteTeamIndex !== -1) {
             this.setState({
                 team: this.props.favoritesTeam[favoriteTeamIndex]
-            })
+            }, () => { this._updateNavigationParams() })
             return
         }
         this.setState({ isLoading: true })
@@ -26,17 +49,35 @@ class TeamDetail extends React.Component {
             this.setState({
                 teams: data.teams[0],
                 isLoading: false
-            })
+            }, () => { this._updateNavigationParams() })
         })
+    }
+
+    _shareTeam() {
+        const team = this.state.teams
+        Share.share({ title: team.strTeam, message: team.strDescriptionEN })
+    }
+
+    _displayFloatingActionButton() {
+        const team = this.state.teams
+        
+        if (team != undefined && Platform.OS === 'android') {
+            return (
+                <TouchableOpacity
+                style={styles.share_touchable_floatingactionbutton}
+                onPress={() => this._shareTeam()}>
+                    <Image 
+                    style={styles.share_image}
+                    source={require('../assets/share.png')}
+                    />
+                </TouchableOpacity>
+            )
+        }
     }
 
     _toggleFavorite() {
         const action = { type: "TOGGLE_FAVORITE", value: this.state.teams }
         this.props.dispatch(action)
-    }
-
-    componentDidUpdate() {
-        
     }
 
     _displayFavoriteImage() {
@@ -95,8 +136,9 @@ class TeamDetail extends React.Component {
     render() {     
         return (
             <View style={styles.main_container}>
-                {this._displayTeam()}
                 {this._displayLoading()}
+                {this._displayTeam()}
+                {this._displayFloatingActionButton()}
             </View>
         )
     }
@@ -191,6 +233,21 @@ const styles = StyleSheet.create({
     favorite_image: {
         width: 40,
         height: 40
+    },
+    share_touchable_floatingactionbutton: {
+        position: 'absolute',
+        width: 60,
+        height: 60,
+        right: 30,
+        bottom: 30,
+        borderRadius: 30,
+        backgroundColor: "#e91e63",
+        justifyContent: "center",
+        alignItems: "center"
+    },
+    share_image: {
+        width: 30,
+        height: 30
     }
 })
 
