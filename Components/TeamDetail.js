@@ -2,6 +2,7 @@ import React from 'react'
 import { StyleSheet, Share, View, Platform, Text, ActivityIndicator, ScrollView, Image, TouchableOpacity } from 'react-native'
 import { getTeamsDetailFromApi } from '../API/FCApi'
 import { connect } from 'react-redux'
+import EnlargeShrink from '../Animations/EnlargeShrink'
 
 class TeamDetail extends React.Component {
 
@@ -82,13 +83,17 @@ class TeamDetail extends React.Component {
 
     _displayFavoriteImage() {
         var sourceImage = require('../assets/heart_empty.png')
+        var shouldEnlarge = false
         if (this.props.favoritesTeam.findIndex(item => item.idTeam === this.state.teams.idTeam) !== -1) {
             sourceImage = require('../assets/heart_full.png')
+            shouldEnlarge = true
         }
         return (
+            <EnlargeShrink shouldEnlarge={shouldEnlarge}>
             <Image
             source={sourceImage}
             style={styles.favorite_image} />
+            </EnlargeShrink>
         )
     }
 
@@ -231,8 +236,9 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     favorite_image: {
-        width: 40,
-        height: 40
+        flex: 1,
+        width: null,
+        height: null
     },
     share_touchable_floatingactionbutton: {
         position: 'absolute',

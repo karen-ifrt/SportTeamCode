@@ -1,7 +1,9 @@
 import React from 'react'
 import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native'
+import FadeIn from '../Animations/FadeIn'
 
 class TeamItem extends React.Component {
+
 
     _displayFavoriteImage() {
         if (this.props.isTeamFavorite) {
@@ -18,21 +20,23 @@ class TeamItem extends React.Component {
         const { team, displayDetailForTeam } = this.props
 
         return (
-            <TouchableOpacity onPress={() => displayDetailForTeam(team.idTeam)} style={styles.main_container}>
-                <Image style={styles.image} source={{ uri: team.strTeamBadge }} />
-                <View style={styles.content_container}>
-                    <View style={styles.date_container}>
-                        {this._displayFavoriteImage()}
-                    </View>
-                    <View style={styles.header_container}>
-                        <Text style={styles.title_text}>{team.strTeam}</Text>
-                        <Text style={styles.sport_text}>{team.strSport}</Text>
-                        <Text style={styles.stadium_text}>{team.strStadium}</Text>
-                        <Text style={styles.capacity_text}>{team.intStadiumCapacity} places</Text>
-                    </View>
+            <FadeIn>
+                <TouchableOpacity onPress={() => displayDetailForTeam(team.idTeam)} style={styles.main_container}>
+                    <Image style={styles.image} source={{ uri: team.strTeamBadge }} />
+                    <View style={styles.content_container}>
+                        <View style={styles.date_container}>
+                            {this._displayFavoriteImage()}
+                        </View>
+                        <View style={styles.header_container}>
+                            <Text style={styles.title_text}>{team.strTeam}</Text>
+                            <Text style={styles.sport_text}>{team.strSport}</Text>
+                            <Text style={styles.stadium_text}>{team.strStadium}</Text>
+                            <Text style={styles.capacity_text}>{team.intStadiumCapacity} places</Text>
+                        </View>
 
-                </View>
-            </TouchableOpacity>
+                    </View>
+                </TouchableOpacity>
+            </FadeIn>
         )
     }
 }
